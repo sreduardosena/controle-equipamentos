@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Controle de Equipamentos - JBL e Caixas de Som</title>
+<style>
+  body {
+    font-family: Arial, sans-serif;
+    background: #f3f3f3;
+    margin: 0;
+    padding: 20px;
+  }
+  h1 {
+    text-align: center;
+    color: #333;
+  }
+  .equipamento {
+    background: white;
+    border-radius: 8px;
+    padding: 15px;
+    margin-bottom: 15px;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+  }
+  button {
+    margin: 5px;
+    padding: 10px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    color: white;
+  }
+  .pegar { background: #007bff; }
+  .devolver { background: #28a745; }
+  .carregar { background: #ffc107; color: black; }
+  .info {
+    margin-top: 10px;
+    font-size: 14px;
+    color: #555;
+  }
+</style>
+</head>
+<body>
+
+<h1>🎵 Controle de Equipamentos 🎧</h1>
+
+<div id="lista"></div>
+
+<script>
+const equipamentos = [
+  "JBL Charge 5",
+  "JBL Flip 6",
+  "Caixa de Som Grande",
+  "Caixa de Som Pequena",
+  "Microfone Sem Fio"
+];
+
+function salvarDados(dados) {
+  localStorage.setItem("equipamentosStatus", JSON.stringify(dados));
+}
+
+function carregarDados() {
+  return JSON.parse(localStorage.getItem("equipamentosStatus")) || {};
+}
+
+let statusEquipamentos = carregarDados();
+
+function atualizarTela() {
+  const lista = document.getElementById("lista");
+  lista.innerHTML = "";
+  equipamentos.forEach(nome => {
+    const dados = statusEquipamentos[nome] || {};
+    const div = document.createElement("div");
+    div.className = "equipamento";
+    div.innerHTML = `
+      <h3>${nome}</h3>
+      <button class="pegar" onclick="registrar('${nome}', 'pegou')">Peguei</button>
+      <button class="devolver" onclick="registrar('${nome}', 'devolveu')">Devolvi</button>
+      <button class="carregar" onclick="registrar('${nome}', 'carregando')">Coloquei pra carregar</button>
+      <div class="info">
+        ${dados.acao ? `<b>Ação:</b> ${dados.acao}<br>` : ""}
+        ${dados.usuario ? `<b>Usuário:</b> ${dados.usuario}<br>` : ""}
+        ${dados.hora ? `<b>Data/Hora:</b> ${dados.hora}` : ""}
+      </div>
+    `;
+    lista.appendChild(div);
+  });
+}
+
+function registrar(equipamento, acao) {
+  const usuario = prompt("Digite seu nome:");
+  if (!usuario) return;
+  const hora = new Date().toLocaleString("pt-BR");
+  statusEquipamentos[equipamento] = { usuario, acao, hora };
+  salvarDados(statusEquipamentos);
+  atualizarTela();
+}
+
+atualizarTela();
+</script>
+
+</body>
+</html>
